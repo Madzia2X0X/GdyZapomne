@@ -1,0 +1,120 @@
+<!--
+    Strona listy postów.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Posty')" />
+<body>
+<div class="container">
+    <div class="topBackground">
+    </div>
+    <div th:replace="fragments/user-actions :: user-actions"></div>
+    <div th:replace="fragments/nav :: logo"></div>
+    <div th:replace="fragments/nav :: nav"></div>
+    <div class="box header">
+        <h2>Wszystkie wpisy o kategorii: {{this.getPostCategory()}}</h2>
+        <h6>Ilość znalezionych wpisów: {{this.getPostCount()}}</h6>
+    </div>
+    <div class="box posts">
+        <ul>
+                <li v-for="post in posts">
+                    <div class="postTitlePreview">
+                        <h2><a :href="getLink(post)">{{post.title}}</a></h2>
+                    </div>
+                    <div class="postInfoPreview">
+                        <h6>by <a :href="getUserLink(post)">{{post.creator.name}} {{post.creator.surname}}</a> / {{ post.dateCreated | moment }}</h6>
+                    </div>
+                    <div v-html="post.preview" class="postBodyPreview">
+                    </div>
+                    <br>
+                    <button class="button" v-on:click="goToPost(post)">Czytaj dalej</button>
+                    <br>
+                    <br>
+                    <hr />
+                </li>
+            </ul>
+        </div>
+    <br />
+    <div class="box bottom">
+        <br />
+        <a class="returnButton" href="/">Powrót do strony głównej</a>
+    </div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    var app = new Vue({
+        el: '.container',
+        data : {
+            posts: []
+        },
+        mounted(){
+            this.fetchPosts();
+        },
+        methods: {
+            /**
+             * Wysyła request metodą GET w celu pobrania z serwera wszystkich postów o podanej kategorii.
+             */
+            fetchPosts(){
+                axios.get("/posts/category/" + this.getPostCategory()).then(function(response){
+                    this.posts = response.data;
+                }.bind(this));
+            },
+            /**
+             * Tworzy link do danego posta.
+             */
+            getLink(post) {
+                return '/post/' + post.id;
+            },
+            /**
+             * Tworzy link do listy wszystkich postów podanego użytkownika.
+             */
+            getUserLink(post) {
+                return '/posts/by_user/' + post.creator.username;
+            },
+            /**
+             * Tworzy link do wszystkich postów o podanej kategorii.
+             */
+            getLinkCategories(post) {
+                return '/posts/category/' + post.category;
+            },
+            /**
+             * Wyciąga kategorię z paska adresu przeglądarki.
+             */
+            getPostCategory() {
+                let splitted = window.location.href.split('/');
+                return splitted[splitted.length-1];
+            },
+            /**
+             * Zwraca ilość postów.
+             */
+            getPostCount() {
+                let postCount = this.posts.length;
+                return postCount;
+            },
+            /**
+             * Przenosi nas na adres podglądu posta o wybranym ID.
+             */
+            goToPost(post) {
+                document.location.replace('/post/' + post.id);
+            },
+            /**
+             * Biblioteka "moment" służy do formatowania daty.
+             */
+            moment: function () {
+                return moment();
+            }
+        },
+        filters: {
+                /**
+                * Formatowanie daty.
+                */
+                moment: function(date) {
+                    moment.locale('pl');
+                    return moment(date).format('LLLL');
+                }
+            }
+    });
+</script>
+</html>

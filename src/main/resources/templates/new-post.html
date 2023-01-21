@@ -1,0 +1,147 @@
+<!--
+    Strona tworzenia nowego posta.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.w3.org/1999/html">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Nowy post')" />
+<body>
+<div class="container">
+    <div class="topBackground">
+    </div>
+    <div th:replace="fragments/user-actions :: user-actions"></div>
+    <div th:replace="fragments/nav :: logo"></div>
+    <div th:replace="fragments/nav :: nav"></div>
+    <div class="box postForm">
+        <br />
+        <br />
+        <h2 style="width: 140%;">Tworzenie nowego posta</h2>
+        <br />
+        <br />
+        <label for="title">Tytuł:</label><br />
+        <input v-model="postTitle" type="text" placeholder="" id="title"/><br />
+        <p>Kategoria posta:</p>
+        <select v-model="postCategory">
+            <option disabled value="">Wybierz kategorię posta</option>
+            <option value="Rodzicielstwo">Rodzicielstwo</option>
+            <option value="Zdrowie">Zdrowie</option>
+            <option value="Porady">Porady</option>
+            <option value="Lifestyle">Lifestyle</option>
+            <option value="Historie">Historie</option>
+        </select>
+        <p>Treść:</p>
+        <editor v-model="postBody" placeholder="Zacznij pisać" :options="editorConfig" theme="snow" style="width:150%; margin-top:5px;"></editor>
+    </div>
+    <div class="box bottom" style="margin-right: 50px; margin-top: 30px;">
+        <button class="button" v-on:click="doPost">Utwórz post</button>
+        <br />
+        <br />
+        <a class="returnButton" href="/">Powrót do strony głównej</a>
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    var app = new Vue({
+        el: '.container',
+        data:{
+            postTitle: '',
+            postBody: '',
+            postCategory: '',
+            roles: [],
+            editorConfig: {
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [ 'link', 'image' ],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['clean']
+                    ]
+                }
+            }
+        },
+        mounted() {
+            if(getCookie("access_token")) {
+                axios.get("/users/getCurrent/roles?access_token=" + getCookie("access_token"))
+                    .then(function (response) {
+                        this.roles = response.data;
+                    }.bind(this));
+            }
+        },
+        methods: {
+            /**
+             * Sprawdza, czy obecnie zalogowany użytkownik ma rolę redaktora.
+             */
+            matchedRedactor() {
+                for (let i = 0; i < this.roles.length; i++) {
+                    if (this.roles[i].authority == "REDACTOR") {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            /**
+             * Wysyła request metodą POST w celu utworzenia nowego posta.
+             */
+            doPost() {
+                if(!getCookie("access_token")) {
+                    window.alert("Nie zalogowano.");
+                    return;
+                }
+                if(!this.matchedRedactor()) {
+                    window.alert("Brak uprawnień.");
+                    return;
+                }
+                if(this.postTitle == "") {
+                    window.alert("Prosimy uzupełnić tytuł posta.");
+                    return;
+                } else if(this.postCategory == "") {
+                    window.alert("Nie wybrano kategorii posta.");
+                    return;
+                } else if(this.postBody == "") {
+                    window.alert("Prosimy uzupełnić treść posta.");
+                    return;
+                } else {
+                    axios({
+                        method:'post',
+                        url:'posts/add',
+                        headers: {"Authorization": "Bearer " + getCookie("access_token")},
+                        data:{title:this.postTitle,body:this.postBody, category:this.postCategory}
+                    }).then((response) => {
+                        window.alert(response.data);
+                        console.log(response.data);
+                        console.log("Status: " + response.status);
+                        document.location.replace("/");
+                    }).catch(error => {
+                        if (error.response) {
+                            window.alert(error.response.data);
+                            console.log(error.response.data);
+                            console.log("Status: " + error.response.status);
+                        }
+                        else if (error.request) {
+                            console.log(error.request);
+                        }
+                        else {
+                            console.log(error);
+                        }
+                    });
+                }
+            }
+        }
+    });
+</script>
+</html>

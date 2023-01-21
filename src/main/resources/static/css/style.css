@@ -1,0 +1,504 @@
+/***** Ustawienia styli dla całego szkieletu strony *****/
+
+* {
+    margin:0;
+    padding:0;
+}
+
+html,body {
+    height:100%;
+    width:100%;
+}
+
+h1 {
+    font-size: 50px;
+}
+
+h2 {
+    font-size: 40px;
+}
+
+h3 {
+    font-size: 30px;
+}
+
+h5 {
+    font-style: italic;
+    font-size: 18px;
+}
+
+h6 {
+    font-style: italic;
+    font-size: 15px;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.topBar {
+    top: 0;
+    grid-column: 10/31;
+    grid-row: 1;
+    color: black;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.navigation {
+    grid-column: 7/31;
+    grid-row: 3/4;
+}
+
+.topBackground {
+    grid-row: 1/4;
+    grid-column: 1/31;
+    background-image: linear-gradient(#0052cc, 	#00BFFF);
+}
+
+.logoPlace {
+    top: 0;
+    padding-top: 10px;
+    grid-column: 1/10;
+    grid-row: 1/4;
+}
+
+.header {
+    color: dimgray;
+    grid-column: 8/30;
+    grid-row: 5/6;
+}
+
+.searchfield {
+    color: dimgray;
+    grid-column: 8/20;
+    grid-row: 5/6;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    font-family: 'Commissioner', sans-serif;
+    display: grid;
+    grid-template-columns: repeat(30, 1fr);
+    grid-template-rows: 50px 50px 50px 50px 70px 30px auto;
+}
+
+.bottom {
+    text-align: center;
+    height: 100px;
+    grid-column: 1/-1;
+    grid-row: 31/31;
+}
+
+/***** Ustawienia stylu dla poszczególnych stron *****/
+
+.posts, .userOptions {
+    grid-column: 8/22;
+    grid-row: 7/31;
+}
+
+.posts ul, .post ul, .comments ul, .redactor1Text ul, .redactor2Text ul,
+.redactor3Text ul, .redactor4Text ul, .postsUO ul {
+    background-color: white;
+}
+
+.posts a:link, .posts a:visited, .post a:link, .post a:visited, .redactor1Text a:link, .redactor1Text a:visited,
+.redactor2Text a:link, .redactor2Text a:visited, .redactor3Text a:link, .redactor3Text a:visited, .comments a:visited,
+.comments a:link, .redactor4Text a:link, .redactor4Text a:visited, .postsUO a:link, .postsUO a:visited, .returnButton:visited,
+.returnButton:link, .contactLeft a:visited, .contactLeft a:link, .contactRight a:visited, .contactRight a:link {
+    padding: 0;
+    text-decoration: none;
+    color: black;
+    background-color: white;
+}
+
+.posts a:hover, .post a:hover, .redactor1Text a:hover, .redactor2Text a:hover,
+.redactor3Text a:hover, .redactor4Text a:hover, .postsUO a:hover, .contactLeft a:hover,
+.contactRight .button, .returnButton:hover, .comments a:hover {
+    color: 	#1E90FF;
+}
+
+/***** Ustawienia styli dla głównej strony *****/
+
+.pages .current {
+    color: #1E90FF !important;
+}
+
+.pages ul {
+    background-color: white;
+    padding: 0;
+    list-style-type: none;
+}
+
+.pages li {
+    display: inline;
+    margin: 5px 5px;
+}
+
+.pages a:hover {
+    color: 	#00BFFF !important;
+}
+
+.pages a:link, .pages a:visited {
+    padding: 0;
+    text-decoration: none;
+    color: black;
+    background-color: white;
+}
+
+.pages {
+    grid-column: 15/17;
+    grid-row: 31/32;
+    padding-bottom: 30px;
+}
+
+/***** Strona wyświetlająca posty danego użytkownika *****/
+
+.postsUO {
+    grid-column: 8/22;
+    grid-row: 7/31;
+}
+
+.userAdmOptionsButton {
+    grid-column: 8/22;
+    grid-row:6/7;
+}
+
+.userAdmOptions {
+    grid-column: 17/31;
+    grid-row:4/7;
+}
+
+/***** Strona pojedynczego posta *****/
+
+.post {
+    grid-column: 8/22;
+    grid-row: 5/18;
+}
+
+.comments {
+    padding: 25px;
+    border-style: groove;
+    border-radius: 10px 10px 10px 10px;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    grid-column: 8/22;
+    grid-row: 21/31;
+}
+
+/***** Strona "O nas" *****/
+
+.aboutTopText {
+    grid-column: 6/17;
+    grid-row: 8/12;
+}
+
+.aboutLeftText {
+    grid-column: 6/17;
+    grid-row: 12/15;
+}
+
+.aboutBottomText {
+    grid-column: 6/20;
+    grid-row: 16/28;
+}
+
+.aboutPhoto {
+    grid-column: 19/27;
+    grid-row: 7/31;
+}
+
+.photoAbout {
+    width: 420px;
+    height: 514px;
+    border-radius: 50%;
+}
+
+/***** Strona "Redaktorzy" *****/
+
+.redactor1Avatar {
+    grid-column: 5/7;
+    grid-row: 7/9;
+}
+
+.photoRedactor1 {
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+}
+
+.redactor1Text {
+    grid-column: 10/26;
+    grid-row: 7/9;
+}
+
+.redactor2Avatar {
+    grid-column: 5/7;
+    grid-row: 10/13;
+}
+
+.photoRedactor2 {
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+}
+
+.redactor2Text {
+    grid-column: 10/26;
+    grid-row: 10/13;
+}
+
+.redactor3Avatar {
+    grid-column: 5/7;
+    grid-row: 14/16;
+}
+
+.photoRedactor3 {
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+}
+
+.redactor3Text {
+    grid-column: 10/26;
+    grid-row: 13/16;
+}
+
+.redactor4Avatar {
+    grid-column: 5/7;
+    grid-row: 17/20;
+}
+
+.photoRedactor4 {
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+}
+
+.redactor4Text {
+    grid-column: 10/26;
+    grid-row: 17/20;
+}
+
+/***** Strona "Kontakt" *****/
+
+.contactLeft {
+    text-align: center;
+    grid-column: 6/15;
+    grid-row: 8/15;
+}
+
+.contactRight {
+    text-align: center;
+    grid-column: 16/26;
+    grid-row: 8/15;
+}
+
+.subscribeForm {
+    padding-top: 20px;
+    text-align: center;
+    grid-column: 6/15;
+    grid-row: 16/23;
+}
+
+.contactForm {
+    padding-top: 20px;
+    text-align: center;
+    grid-column: 16/26;
+    grid-row: 16/23;
+}
+
+/***** Inne *****/
+
+.loginForm {
+    grid-column: 12/19;
+    grid-row: 4/31;
+    text-align: center;
+}
+
+.postForm {
+    grid-column: 8/19;
+    grid-row: 4/31;
+
+}
+.postForm h2 {
+    text-align: center;
+}
+
+.topBar li, .topBar .button {
+    float: left;
+}
+
+.navigation li {
+    float: left;
+}
+
+.logo {
+    width: 360px;
+    height: 130px;
+    padding-left: 10%;
+}
+
+.nav_options {
+    margin: 0 auto;
+    width: 70%;
+}
+
+.nav_buttons {
+    display: inline-block;
+    width: 60%;
+    height: 100%;
+}
+
+#loginButtons {
+    margin-right: 20px;
+}
+
+
+.postTitlePreview {
+    padding-top: 30px;
+}
+
+.postInfoPreview, .postInfo {
+    padding-top: 10px;
+}
+
+.postBodyPreview {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 20px;
+    max-height: 300px;
+}
+
+.postBody {
+    padding-top: 20px;
+}
+
+li a, .dropbtn, .topBar .button {
+    display: inline-block;
+    color: white;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover, .dropdown:hover .dropbtn, .topBar .button:hover {
+    background-color: #00BFFF;
+}
+
+li.dropdown {
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+.dropdown-content a:hover {
+    background-color: lightgray;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+input[type=text] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.postForm input[type=text], select, textarea, input[type=email] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.loginForm input[type=submit], .postForm input[type=submit], .userOptions input[type=submit], .bottom input[type=submit] {
+    background-color: #1E90FF;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #00BFFF;
+}
+
+.topBar .button {
+    background-color: transparent;
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    font-family: 'Commissioner', sans-serif;
+    border: none;
+}
+
+.topBar .button:hover, .userAdmOptions .button:hover, .comments .button:hover, .pages .button:hover,
+.userAdmOptionsButton .button, .posts .button:hover, .bottom .button:hover, .postsUO .button:hover {
+    background-color: #00BFFF;
+}
+
+.topBar .welcome_msg {
+    color: white;
+    padding-top: 10px;
+    padding-right: 10px;
+}
+
+.userAdmOptions .button, .comments .button, .pages .button, .userOptions .button, .bottom .button,
+.contactLeft .button, .contactRight .button, .userAdmOptionsButton .button, .posts .button, .postsUO .button ,
+.searchfield .button {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 7px 10px;
+    font-family: 'Commissioner', sans-serif;
+    border: none;
+    background-color: #1E90FF;
+}

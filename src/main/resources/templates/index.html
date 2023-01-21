@@ -1,0 +1,140 @@
+<!--
+    Strona główna
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Strona główna')" />
+<body>
+    <div class="container">
+        <div class="topBackground"></div>
+        <div th:replace="fragments/user-actions :: user-actions"></div>
+        <div th:replace="fragments/nav :: logo"></div>
+        <div th:replace="fragments/nav :: nav"></div>
+        <div class="box header">
+            <h1>Najnowsze wpisy:</h1>
+        </div>
+        <div class="box posts">
+            <ul>
+                <li v-for="post in paginate">
+                    <div class="postTitlePreview">
+                        <h2><a :href="getLink(post)">{{post.title}}</a></h2>
+                    </div>
+                    <div class="postInfoPreview">
+                        <h6>Autor: <a :href="getLinkUserPosts(post)">{{post.creator.name}} {{post.creator.surname}}</a> | Opublikowano: {{ post.dateCreated | moment }} | Kategoria: <a :href="getLinkCategories(post)">{{post.category}}</a></h6>
+                    </div>
+                    <div v-html="post.preview" class="postBodyPreview">
+                    </div>
+                    <br>
+                    <button class="button" v-on:click="goToPost(post)">Czytaj dalej</button>
+                    <br>
+                    <br>
+                    <hr />
+                </li>
+            </ul>
+        </div>
+    <div class="box pages">
+        <br />
+        <ul>
+            <li v-for="pageNumber in totalPages" v-if="Math.abs(pageNumber - currentPage) < 3 || pageNumber == totalPages || pageNumber == 1">
+                <a v-bind:key="pageNumber" href="#" @click="setPage(pageNumber)" :class="{current: currentPage === pageNumber, last: (pageNumber == totalPages && Math.abs(pageNumber - currentPage) > 3), first:(pageNumber == 1 && Math.abs(pageNumber - currentPage) > 3)}">{{ pageNumber }}</a>
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+
+<script>
+    var app = new Vue({
+        el: '.container',
+        data :
+            {
+            posts: [],
+            currentPage: 1,
+            itemsPerPage: 5,
+            resultCount: 0
+        },
+        mounted(){
+            this.fetchPosts();
+        },
+        computed: {
+            /**
+             * Liczy ilość stron postów.
+             */
+            totalPages: function() {
+                return Math.ceil(this.resultCount / this.itemsPerPage)
+            },
+            /**
+             * Funkcja, która dzieli wszytskie posty na strony - czyli tak zwane stronicowanie.
+             */
+            paginate: function() {
+                if(this.currentPage==0) {
+                    this.currentPage=1;
+                }
+                this.resultCount = this.posts.length
+                if (this.currentPage >= this.totalPages) {
+                    this.currentPage = this.totalPages
+                }
+                let index = this.currentPage * this.itemsPerPage - this.itemsPerPage
+                return this.posts.slice(index, index + this.itemsPerPage)
+            }
+        },
+        methods: {
+            /**
+             * Wysyła request metodą GET w celu pobrania z serwera wszystkich postów.
+             */
+            fetchPosts() {
+                axios.get("/posts").then(function(response) {
+                    this.posts = response.data;
+                }.bind(this));
+            },
+            /**
+             * Tworzy link do posta z podanym ID.
+             */
+            getLink(post) {
+                return '/post/' + post.id;
+            },
+            /**
+             * Tworzy link do listy postów przefiltrowanej według podanej kategorii.
+             */
+            getLinkCategories(post) {
+                return '/posts/filtered/category/' + post.category;
+            },
+            /**
+             * Tworzy link do listy postów przefiltrowanej według podanego użytkownika.
+             */
+            getLinkUserPosts(post) {
+                return '/posts/filtered/user/' + post.creator.username;
+            },
+            /**
+             * Biblioteka "moment" służy do formatowania daty.
+             */
+            moment: function () {
+                return moment();
+            },
+            /**
+             * Służy do ustawiania odpowiedniej strony w funkcji stronicowania.
+             */
+            setPage: function(pageNumber) {
+                this.currentPage = pageNumber
+            },
+            /**
+             * Przechodzi do podglądu posta o podanym ID.
+             */
+            goToPost(post) {
+                document.location.replace('/post/' + post.id);
+            }
+        },
+        filters: {
+            /**
+             * Formatowanie daty.
+             */
+            moment: function(date) {
+                moment.locale('pl');
+                return moment(date).format('LLLL');
+            },
+        }
+    });
+</script>
+</html>

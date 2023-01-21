@@ -1,0 +1,84 @@
+<!--
+    Strona rejestracji użytkownika.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Rejestracja')" />
+<body>
+<div class="container">
+    <div class="topBackground">
+    </div>
+    <div th:replace="fragments/user-actions :: user-actions"></div>
+    <div th:replace="fragments/nav :: logo"></div>
+    <div th:replace="fragments/nav :: nav"></div>
+    <div class="box loginForm">
+        <br />
+        <br />
+        <h2>Zarejestruj się</h2>
+        <br />
+        <br />
+        <label for="name">Imię</label><br />
+        <input v-model="firstname" class="u-full-width" type="text" placeholder="" id="name"/><br />
+        <label for="surname">Nazwisko</label><br />
+        <input v-model="surname" type="text" placeholder="" id="surname"/><br />
+        <label for="surname">Adres e-mail</label><br />
+        <input v-model="email" type="text" placeholder="" id="email"/><br />
+        <label for="username">Nazwa użytkownika</label><br />
+        <input v-model="username"  type="text" placeholder="Używanie znaków specjalnych jest zabronione" id="username"/><br />
+        <label for="password">Hasło</label><br />
+        <input v-model="password" type="password" id="password"/><br />
+        <label for="passwordConfirm">Potwierdź hasło</label><br />
+        <input v-model="passwordConfirm" type="password" id="passwordConfirm"/><br />
+        <input type="submit" v-on:click="register" value="Zarejestruj"/>
+        <br />
+    </div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    let app = new Vue({
+        el: '.container',
+        data: {
+            firstname: '',
+            surname: '',
+            username: '',
+            email: '',
+            password: '',
+            passwordConfirm: ''
+        },
+        methods: {
+            /**
+             * Wysyła request POST z danymi pobranymi z formularza rejestracji w celu utworzenia nowego użytkownika na serwerze.
+             */
+            register() {
+                if(this.password !== this.passwordConfirm) {
+                    alert("Hasła nie są identyczne.");
+                    return;
+                }
+                axios({
+                    method:'post',
+                    url:'users/register',
+                    data:{username:this.username,password:this.password,passwordConfirmation:this.passwordConfirm,name:this.firstname, surname:this.surname, email:this.email}
+                }).then((response) => {
+                    window.alert(response.data);
+                    console.log(response.data);
+                    console.log("Status: " + response.status);
+                    document.location.replace("/");
+                }).catch(error => {
+                    if (error.response) {
+                        window.alert(error.response.data);
+                        console.log(error.response.data);
+                        console.log("Status: " + error.response.status);
+                    }
+                    else if (error.request) {
+                        console.log(error.request);
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+            }
+        }
+    });
+</script>
+</html>
