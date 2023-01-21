@@ -1,0 +1,278 @@
+<!--
+    Strona podglądu użytkownika.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Użytkownik')" />
+<body>
+<div class="container">
+    <div class="topBackground">
+    </div>
+    <div th:replace="fragments/user-actions :: user-actions"></div>
+    <div th:replace="fragments/nav :: logo"></div>
+    <div th:replace="fragments/nav :: nav"></div>
+    <div class="box header">
+        <h1 style="overflow: hidden; height: 100%">Podgląd użytkownika: {{name}}</h1>
+    </div>
+    <div class="box userAdmOptionsButton">
+        <div v-if="matchedAdmin()">
+            <button v-if="admMenuHidden == true" class="button" v-on:click="admMenuHidden = false">Pokaż opcje administratora</button>
+            <button v-else class="button" v-on:click="admMenuHidden = !admMenuHidden">Ukryj opcje administratora</button>
+        </div>
+    </div>
+        <div style="padding-top: 20px" v-if="!admMenuHidden" class="box userAdmOptions">
+                <button class="button" v-on:click="deleteUser()">Usuń użytkownika</button>
+                <button class="button" v-if="isHidden == true" v-on:click="isHidden = !isHidden">Zresetuj hasło</button>
+                <button class="button" v-else v-on:click="isHidden = !isHidden">Zwiń</button>
+                <button class="button" v-on:click="makeRedactor()">Przyznaj rolę redaktora</button>
+                <button class="button" v-on:click="makeUser()">Odbierz rolę redaktora</button>
+                <div style="width: 30%; padding-top: 10px; padding-left: 137px" v-if="!isHidden" class="passwordReset">
+                    <label for="password">Nowe hasło</label><br />
+                    <input v-model="password" type="password" id="password"/><br />
+                    <input class="button" type="submit" v-on:click="resetPassword()" value="Wyślij"/>
+                    <button class="button" v-on:click="isHidden = !isHidden">Zamknij</button>
+                </div>
+        </div>
+    <div class="box postsUO">
+        <h2>Posty użytkownika:</h2>
+        <div v-if="ifPostsNotEmpty()">
+            <ul>
+                <li v-for="post in posts">
+                    <div class="postTitlePreview">
+                        <h2><a :href="getLink(post)">{{post.title}}</a></h2>
+                    </div>
+                    <div class="postInfoPreview">
+                        <h6>{{ post.dateCreated | moment }} | Kategoria: <a :href="getLinkCategories(post)">{{post.category}}</a></h6>
+                    </div>
+                    <div v-html="post.preview" class="postBodyPreview">
+                    </div>
+                    <br>
+                    <button class="button" v-on:click="goToPost(post)">Czytaj dalej</button>
+                    <br>
+                    <br>
+                    <hr />
+                </li>
+            </ul>
+        </div>
+        <div v-else>
+            <br />
+            <h4>Użytkownik nie utworzył jeszcze żadnych postów.</h4>
+            <br />
+        </div>
+    </div>
+    <br />
+    <div class="box bottom">
+        <br />
+        <a class="returnButton" href="/">Powrót do strony głównej</a>
+    </div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    let app = new Vue({
+        el: '.container',
+        data: {
+            name: '',
+            posts: [],
+            roles: [],
+            isHidden: true,
+            admMenuHidden: true,
+            password: ''
+        },
+        mounted(){
+            this.fetchName();
+            this.fetchPosts();
+            this.fetchRoles();
+        },
+        methods: {
+            /**
+             * Sprawdza czy z serwera zostały pobrane jakiekolwiek posty.
+             */
+            ifPostsNotEmpty() {
+                if(this.posts.length > 0)
+                    return true;
+            },
+            /**
+             * Wysyła request metodą GET w celu pobrania z serwera wszystkich ról przypisanych do obecnie zalogowanego użytkownika.
+             */
+            fetchRoles() {
+                axios.get("/users/getCurrent/roles?access_token=" + getCookie("access_token")).then(function (response) {
+                    this.roles = response.data;
+                }.bind(this));
+            },
+            /**
+             * Wysyła request metodą GET w celu pobrania z serwera wszystkich postów podanego użytkownika.
+             */
+            fetchPosts() {
+                axios.get("/posts/user/" + this.getUsername()).then(function(response) {
+                    this.posts = response.data;
+                }.bind(this));
+            },
+            /**
+             * Wysyła request metodą GET w celu pobrania z serwera imienia obecnie zalogowanego użytkownika.
+             */
+            fetchName() {
+                    axios.get("/users/getName/" + this.getUsername()).then(function (response) {
+                        this.name = response.data;
+                    }.bind(this));
+            },
+            /**
+             * Sprawdza czy pobrane z serwera role obecnie zalogowanego użytkownika posiadają uprawnienia administratora.
+             */
+            matchedAdmin() {
+                for(let i=0; i<this.roles.length; i++)
+                {
+                    if (this.roles[i].authority == "ADMIN")
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            /**
+             * Sprawdza czy użytkownik jest obecnie zalogowany.
+             */
+            isLoggedIn() {
+                return window.Event.isLoggedIn;
+            },
+            /**
+             * Wysyła request metodą DELETE w celu usunięcia z serwera podanego użytkownika.
+             */
+            deleteUser() {
+                axios.delete("/users/" + this.getUsername() + "?access_token=" + getCookie("access_token"))
+                    .then((response) => {
+                    window.alert(response.data);
+                    console.log(response.data);
+                    console.log("Status: " + response.status);
+                        document.location.replace("/");
+                }).catch(error => {
+                    if (error.response) {
+                        window.alert(error.response.data);
+                        console.log(error.response.data);
+                        console.log("Status: " + error.response.status);
+                    }
+                    else if (error.request) {
+                        console.log(error.request);
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+            },
+            /**
+             * Wysyła request metodą PATCH w celu przyznania podanemu użytkownikowi roli redaktora.
+             */
+            makeRedactor() {
+                axios.patch("/users/setRedactor/" + this.getUsername() + "?access_token=" + getCookie("access_token"))
+                    .then((response) => {
+                        window.alert(response.data);
+                        console.log(response.data);
+                        console.log("Status: " + response.status);
+                    }).catch(error => {
+                    if (error.response) {
+                        window.alert(error.response.data);
+                        console.log(error.response.data);
+                        console.log("Status: " + error.response.status);
+                    }
+                    else if (error.request) {
+                        console.log(error.request);
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+            },
+            /**
+             * Wysyła request metodą PATCH w celu przyznania podanemu użytkownikowi roli zwykłego użytkownika.
+             */
+            makeUser() {
+                axios.patch("/users/setUser/" + this.getUsername() + "?access_token=" + getCookie("access_token"))
+                    .then((response) => {
+                        window.alert(response.data);
+                        console.log(response.data);
+                        console.log("Status: " + response.status);
+                    }).catch(error => {
+                    if (error.response) {
+                        window.alert(error.response.data);
+                        console.log(error.response.data);
+                        console.log("Status: " + error.response.status);
+                    }
+                    else if (error.request) {
+                        console.log(error.request);
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+            },
+            /**
+             * Wysyła request metodą PATCH w celu zmiany hasła podanemu użytkownikowi.
+             */
+            resetPassword() {
+                axios({
+                    method:'patch',
+                    url:'/users/' + this.getUsername() + "?access_token=" + getCookie("access_token"),
+                    data:{responseString:this.password}
+                }).then((response) => {
+                    window.alert(response.data);
+                    console.log(response.data);
+                    console.log("Status: " + response.status);
+                }).catch(error => {
+                    if (error.response) {
+                        window.alert(error.response.data);
+                        console.log(error.response.data);
+                        console.log("Status: " + error.response.status);
+                    }
+                    else if (error.request) {
+                        console.log(error.request);
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+            },
+            /**
+             * Zwraca link do posta o podanym ID.
+             */
+            getLink(post) {
+                return '/post/' + post.id;
+            },
+            /**
+             * Przechodzimy na stronę podglądu posta o podanym ID.
+             */
+            goToPost(post) {
+                document.location.replace('/post/' + post.id);
+            },
+            /**
+             * Zwraca link do listy postów o podanej kategorii.
+             */
+            getLinkCategories(post) {
+                return '/posts/by_category/' + post.category;
+            },
+            /**
+             * Wyciąga nazwę użytkownika z paska adresu przeglądarki.
+             */
+            getUsername() {
+                var splitted = window.location.href.split('/');
+                return splitted[splitted.length-1];
+            },
+            /**
+             * Biblioteka "moment" służy do formatowania daty.
+             */
+            moment: function () {
+                return moment();
+            }
+        },
+        filters: {
+            /**
+             * Formatowanie daty.
+             */
+                moment: function(date) {
+                    moment.locale('pl');
+                    return moment(date).format('LLLL');
+                }
+            }
+    });
+</script>
+</html>

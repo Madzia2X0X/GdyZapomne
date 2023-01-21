@@ -1,0 +1,183 @@
+<!--
+    Strona "Kontakt"
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Kontakt')" />
+<body>
+<div class="container">
+    <div class="topBackground">
+    </div>
+    <div th:replace="fragments/user-actions :: user-actions"></div>
+    <div th:replace="fragments/nav :: logo"></div>
+    <div th:replace="fragments/nav :: nav"></div>
+    <div class="box header">
+        <h1>Kontakt</h1>
+    </div>
+    <div class="box contactLeft">
+        <h2>Subskrybuj nasz blog</h2>
+        <br />
+        <h6>Chcesz być na bieżąco z zawartością bloga?</h6>
+        <h6>Zostań subskrybentem bloga i otrzymuj od nas powiadomienia o nowych postach. </h6>
+        <br />
+        <button class="button" type="submit" v-on:click="subscriberOptionsHidden = false">Zapisz się</button>
+        <div v-if="!subscriberOptionsHidden" class="subscribeForm">
+            <div v-if="isLoggedIn()">
+                <button class="button" v-on:click="subscribe()">Subskrybuj</button>
+                <button style="background-color: red !important;" class="button" v-on:click="unsubscribe()">Zrezygnuj z subskrybcji</button>
+                <button style="background-color: gray !important;" class="button" v-on:click="subscriberOptionsHidden = !subscriberOptionsHidden">Zamknij</button>
+            </div>
+            <div v-else>
+                <h6>Żeby nas subskrybować wymagane jest utworzenie konta na blogu i zalogowanie się.</h6>
+                <br>
+                <button class="button" v-on:click="goToRegistration()">Zarejestruj się</button>
+            </div>
+        </div>
+    </div>
+    <div class="box contactRight">
+        <h2>Formularz kontaktowy</h2>
+        <br />
+        <h6>Chcesz się z nami skontaktować? Możesz skorzystać z poniższego z formularza kontaktowego.</h6>
+        <h6>Postaramy odpowiedzieć się jak najszybciej.</h6>
+        <br />
+        <button class="button" type="submit" v-on:click="contactFormHidden = false">Pokaż formularz kontaktowy</button>
+        <div v-if="!contactFormHidden" class="contactForm">
+            <h3><label for="name">Imię i nazwisko:</label></h3>
+            <input v-model="name" style="width:300px"type="text" id="name"/><br />
+            <h3><label for="body">Wiadomość:</label></h3>
+            <textarea v-model="body" id="body" style="width:400px;height:150px"></textarea><br />
+            <button class="button" type="submit" v-on:click="sendMail()">Wyślij wiadomość</button>
+            <button style="background-color: gray !important;" class="button" v-on:click="contactFormHidden = !contactFormHidden">Zamknij</button>
+        </div>
+        <br>
+        <h2></h2>
+    </div>
+    <div class="box bottom">
+    </div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    let app = new Vue({
+        el: '.container',
+        data : {
+            name: '',
+            body: '',
+            email: '',
+            contactFormHidden: true,
+            subscriberOptionsHidden: true
+        },
+        created() {
+            this.fetchEmail();
+        },
+        methods: {
+            /**
+             * Wysyła request metodą GET w celu pobrania z serwera adres e-mail obecnie zalogowanego użytkownika.
+             */
+            fetchEmail() {
+                    axios.get("/users/getCurrent/email?access_token=" + getCookie("access_token")).then(function (response) {
+                        this.email = response.data;
+                    }.bind(this));
+            },
+            /**
+             * Wysyła request metodą POST do kontrolera maili w celu wysłania wiadomości e-mail do administratora bloga.
+             */
+            sendMail() {
+                if(this.name == "") {
+                    window.alert("Prosimy uzupełnić imię i nazwisko.");
+                    return;
+                } else if (this.body == "") {
+                    window.alert("Prosimy uzupełnić treść maila.");
+                    return;
+                } else {
+                    axios({
+                        method: 'post',
+                        url: '/mails/contact',
+                        data: {title: this.name, body: this.body}
+                    }).then((response) => {
+                        window.alert(response.data);
+                        console.log(response.data);
+                        console.log("Status: " + response.status);
+                    }).catch(error => {
+                        if (error.response) {
+                            window.alert(error.response.data);
+                            console.log(error.response.data);
+                            console.log("Status: " + error.response.status);
+                        } else if (error.request) {
+                            console.log(error.request);
+                        } else {
+                            console.log(error);
+                        }
+                    });
+                }
+            },
+            /**
+             * Sprawdza czy obecnie jest zalogowany użytkownik.
+             */
+            isLoggedIn() {
+                return window.Event.isLoggedIn;
+            },
+            /**
+             * Wysyła request metodą POST do kontrolera maili w celu dodania adresu e-mail do listy subskrybentów.
+             */
+            subscribe() {
+                axios({
+                    method:'post',
+                    url:'/mails/subscribe?access_token=' + getCookie("access_token"),
+                    data: {
+                        responseString: this.email
+                    }
+                }).then((response) => {
+                    window.alert(response.data);
+                    console.log(response.data);
+                    console.log("Status: " + response.status);
+                }).catch(error => {
+                    if (error.response) {
+                        window.alert(error.response.data);
+                        console.log(error.response.data);
+                        console.log("Status: " + error.response.status);
+                    }
+                    else if (error.request) {
+                        console.log(error.request);
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+            },
+            /**
+             * Przechodzi na stronę rejestracji.
+             */
+            goToRegistration() {
+                document.location.replace('/register');
+            },
+            /**
+             * Wysyła request metodą DELETE do kontrolera maili w celu usunięcia adresu e-mail z listy subskrybentów.
+             */
+            unsubscribe() {
+                axios({
+                    method:'delete',
+                    url:'/mails/subscribe?access_token=' + getCookie("access_token"),
+                    data:{responseString:this.email}
+                }).then((response) => {
+                    window.alert(response.data);
+                    console.log(response.data);
+                    console.log("Status: " + response.status);
+                }).catch(error => {
+                    if (error.response) {
+                        window.alert(error.response.data);
+                        console.log(error.response.data);
+                        console.log("Status: " + error.response.status);
+                    }
+                    else if (error.request) {
+                        console.log(error.request);
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+            }
+        }
+    });
+</script>
+</html>

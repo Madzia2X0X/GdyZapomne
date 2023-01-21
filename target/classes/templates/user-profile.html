@@ -1,0 +1,425 @@
+<!--
+    Strona ustawień profilu użytkownika.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Profil')" />
+<body>
+<div class="container">
+    <div class="topBackground">
+    </div>
+    <div th:replace="fragments/user-actions :: user-actions"></div>
+    <div th:replace="fragments/nav :: logo"></div>
+    <div th:replace="fragments/nav :: nav"></div>
+    <div class="box header">
+        <h1>Profil użytkownika</h1>
+    </div>
+    <div class="box userOptions">
+        <br />
+        <h3>Informacje o zalogowanym użytkowniku:</h3>
+        <h4>Imię i nazwisko: <i>{{infName}} {{infSurname}}</i></h4>
+        <h4>Adres e-mail: <i>{{infEmail}}</i></h4>
+        <h4>Nazwa użytkownika: <i>{{infUsername}}</i></h4>
+        <br />
+        <br />
+        <h3>Zmień hasło</h3>
+        <br />
+        <button class="button" v-on:click="chgPwd = false">Zmień hasło</button>
+        <div style="width: 30%; padding-top: 20px" v-if="!chgPwd" class="chgPwdMenu">
+            <label for="password">Nowe hasło</label><br />
+            <input v-model="password" type="password" id="password"/><br />
+            <label for="passwordConfirm">Potwierdź hasło</label><br />
+            <input v-model="passwordConfirm" type="password" id="passwordConfirm"/><br />
+            <button class="button" v-on:click="changePassword()">Wyślij</button>
+            <button style="background-color: gray !important;" class="button" v-on:click="chgPwd = !chgPwd">Zamknij</button>
+        </div>
+        <br />
+        <br />
+        <h3>Usuń swoje konto</h3>
+        <br />
+        <p>Jeśli jesteś pewien, naciśnij poniższy przycisk:</p>
+        <br />
+        <button style="background-color: red !important;" class="button" v-on:click="deleteUserSelf()">Usuń konto</button>
+        <br />
+        <br />
+        <br />
+        <div v-if="matchedAdmin()">
+            <button v-if="admMenuHidden == true" class="button" v-on:click="admMenuHidden = false">Pokaż opcje administratora</button>
+            <button style="background-color: gray !important;" v-else class="button" v-on:click="admMenuHidden = !admMenuHidden">Ukryj opcje administratora</button>
+            <div style="padding-top: 20px" v-if="!admMenuHidden" class="adminMenu">
+                <button style="margin-right: 5px; margin-top: 5px;" class="button" v-on:click="delUsrHidden = false, chgUsrType = true, rstUsrPass = true, sndMailToSub = true">Usuń wybranego użytkownika</button>
+                <button style="margin-right: 5px; margin-top: 5px;" class="button" v-on:click="delUsrHidden = true, chgUsrType = false, rstUsrPass = true, sndMailToSub = true">Zmień typ konta użytkownika</button>
+                <button style="margin-right: 5px; margin-top: 5px;" class="button" v-on:click="delUsrHidden = true, chgUsrType = true, rstUsrPass = false, sndMailToSub = true">Zresetuj hasło użytkownika</button>
+                <button style="margin-right: 5px; margin-top: 5px;" class="button" v-on:click="delUsrHidden = true, chgUsrType = true, rstUsrPass = true, sndMailToSub = false">Wyślij maila do wszystkich subskrybentów</button>
+                <div style="width: 30%; padding-top: 20px" v-if="!delUsrHidden" class="deleteUserMenu">
+                    <label for="username">Nazwa użytkownika</label><br />
+                    <input v-model="username" type="text" id="username"/><br />
+                    <button style="background-color: red !important;" class="button" type="submit" v-on:click="deleteUser()">Usuń konto</button>
+                    <button style="background-color: gray !important;" class="button" v-on:click="delUsrHidden = !delUsrHidden">Zamknij</button>
+                </div>
+                <div style="width: 70%; padding-top: 20px" v-if="!chgUsrType" class="changeUserTypeMenu">
+                    <label for="username2">Nazwa użytkownika</label><br />
+                    <input v-model="username2" type="text" size="20" id="username2"/><br />
+                    <button style="margin-right: 5px; margin-top: 5px;" class="button" type="submit" v-on:click="makeUser()">Standardowy użytkownik</button>
+                    <button style="margin-right: 5px; margin-top: 5px;" class="button" type="submit" v-on:click="makeRedactor()">Redaktor</button>
+                    <button style="margin-right: 5px; margin-top: 5px;" class="button" type="submit" v-on:click="makeAdmin()">Administrator</button>
+                    <button style="margin-right: 5px; margin-top: 5px; background-color: gray !important;" class="button" v-on:click="chgUsrType = !chgUsrType">Zamknij</button>
+                </div>
+                <div style="width: 30%; padding-top: 20px" v-if="!rstUsrPass" class="resetUserPasswordMenu">
+                    <label for="username3">Nazwa użytkownika</label><br />
+                    <input v-model="username3" type="text" id="username3"/><br />
+                    <label for="password2">Nowe hasło</label><br />
+                    <input v-model="password2" type="password" id="password2"/><br />
+                    <label for="passwordConfirm2">Potwierdź hasło</label><br />
+                    <input v-model="passwordConfirm2"  type="password" id="passwordConfirm2"/><br />
+                    <button class="button" v-on:click="resetPassword()">Wyślij</button>
+                    <button style="background-color: gray !important;" class="button" v-on:click="rstUsrPass = !rstUsrPass">Zamknij</button>
+                </div>
+                <div style="width: 70%; padding-top: 20px" v-if="!sndMailToSub" class="sendMailToSubscribers">
+                    <label for="mailTopic">Temat</label><br />
+                    <input v-model="mailTopic"  type="text" id="mailTopic"/><br />
+                    <label for="mailBody">Treść</label><br />
+                    <textarea v-model="mailBody" placeholder="" id="mailBody"></textarea>
+                    <button class="button" v-on:click="sendMail()">Wyślij maila</button>
+                    <button style="background-color: gray !important;" class="button" v-on:click="sndMailToSub = !sndMailToSub">Zamknij</button>
+                </div>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+            </div>
+        </div>
+    </div>
+    <div class="box bottom"></div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    let app = new Vue({
+        el: '.container',
+        data: {
+            roles: [],
+            password: '',
+            passwordConfirm: '',
+            password2: '',
+            passwordConfirm2: '',
+            username: '',
+            username2: '',
+            mailTopic: '',
+            mailBody: '',
+            infName: '',
+            infSurname: '',
+            infEmail: '',
+            infUsername: '',
+            chgPwd: true,
+            admMenuHidden: true,
+            delUsrHidden: true,
+            chgUsrType: true,
+            rstUsrPass: true,
+            sndMailToSub: true
+        },
+        created() {
+            this.fetchRoles();
+            this.fetchUser();
+        },
+        methods: {
+            /**
+             * Wysyła request metodą GET w celu pobrania z serwera wszystkich ról przypisanych do obecnie zalogowanego użytkownika.
+             */
+            fetchRoles() {
+                axios.get("/users/getCurrent/roles?access_token=" + getCookie("access_token")).then(function (response) {
+                    this.roles = response.data;
+                }.bind(this));
+            },
+            /**
+             * Wysyła requesty metodą GET w celu pobrania z serwera danych obecnie zalogowanego użytkownika.
+             */
+            fetchUser() {
+                axios.get("/users/getCurrent/email?access_token=" + getCookie("access_token")).then(function (response) {
+                    this.infEmail = response.data;
+                }.bind(this));
+                axios.get("/users/getCurrent/name?access_token=" + getCookie("access_token")).then(function (response) {
+                    this.infName = response.data;
+                }.bind(this));
+                axios.get("/users/getCurrent/surname?access_token=" + getCookie("access_token")).then(function (response) {
+                    this.infSurname = response.data;
+                }.bind(this));
+                axios.get("/users/getCurrent/username?access_token=" + getCookie("access_token")).then(function (response) {
+                    this.infUsername = response.data;
+                }.bind(this));
+            },
+            /**
+             * Zwraca link do posta o podanym ID.
+             */
+            getLink(post) {
+                return '/posts/' + post.id;
+            },
+            /**
+             * Wysyła request metodą PATCH w celu zmiany hasła obecnie zalogowanemu użytkownikowi.
+             */
+            changePassword() {
+                if (this.password !== this.passwordConfirm) {
+                    window.alert("Hasła się nie zgadzają!");
+                    return;
+                } else if (this.password == "") {
+                    window.alert("Hasło nie może być puste!")
+                    return;
+                }
+                axios({
+                    method: 'patch',
+                    url: 'users?access_token=' + getCookie("access_token"),
+                    data: {responseString: this.password}
+                }).then((response) => {
+                    window.alert(response.data);
+                    console.log(response.data);
+                    console.log("Status: " + response.status);
+                    this.chgPwd = true;
+                }).catch(error => {
+                    if (error.response) {
+                        window.alert(error.response.data);
+                        console.log(error.response.data);
+                        console.log("Status: " + error.response.status);
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log(error);
+                    }
+                });
+            },
+            /**
+             * Sprawdza czy pobrane z serwera role obecnie zalogowanego użytkownika posiadają uprawnienia administratora.
+             */
+            matchedAdmin() {
+                for (let i = 0; i < this.roles.length; i++) {
+                    if (this.roles[i].authority == "ADMIN") {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            /**
+             * Wysyła request metodą DELETE w celu usunięcia z serwera podanego użytkownika.
+             */
+            deleteUser() {
+                if (this.username == "admin") {
+                    window.alert("Nie wolno usunąć konta głównego administratora.");
+                    return;
+                } else if (this.username == "") {
+                    window.alert("Prosimy uzupełnić nazwę użytkownika.");
+                    return;
+                } else {
+                    axios.delete("/users/" + this.username + "?access_token=" + getCookie("access_token"))
+                        .then((response) => {
+                            window.alert(response.data);
+                            console.log(response.data);
+                            console.log("Status: " + response.status);
+                            document.location.replace("/");
+                        }).catch(error => {
+                        if (error.response) {
+                            window.alert(error.response.data);
+                            console.log(error.response.data);
+                            console.log("Status: " + error.response.status);
+                        } else if (error.request) {
+                            console.log(error.request);
+                        } else {
+                            console.log(error);
+                        }
+                    });
+                }
+            },
+            /**
+             * Wysyła request metodą PATCH w celu przyznania podanemu użytkownikowi roli administratora.
+             */
+            makeAdmin() {
+                if (this.username2 == "") {
+                    window.alert("Prosimy uzupełnić nazwę użytkownika.");
+                    return;
+                } else {
+                    axios.patch("/users/setAdmin/" + this.username2 + "?access_token=" + getCookie("access_token"))
+                        .then((response) => {
+                            window.alert(response.data);
+                            console.log(response.data);
+                            console.log("Status: " + response.status);
+                        }).catch(error => {
+                        if (error.response) {
+                            window.alert(error.response.data);
+                            console.log(error.response.data);
+                            console.log("Status: " + error.response.status);
+                        } else if (error.request) {
+                            console.log(error.request);
+                        } else {
+                            console.log(error);
+                        }
+                    });
+                }
+            },
+            /**
+             * Wysyła request metodą PATCH w celu przyznania podanemu użytkownikowi roli redaktora.
+             */
+            makeRedactor() {
+                if (this.username2 == "admin") {
+                    window.alert("Nie można zmniejszyć uprawnień konta wbudowanego administratora.");
+                    return;
+                } else if (this.username2 == "") {
+                    window.alert("Prosimy uzupełnić nazwę użytkownika.");
+                    return;
+                } else {
+                    axios.patch("/users/setRedactor/" + this.username2 + "?access_token=" + getCookie("access_token"))
+                        .then((response) => {
+                            window.alert(response.data);
+                            console.log(response.data);
+                            console.log("Status: " + response.status);
+                        }).catch(error => {
+                        if (error.response) {
+                            window.alert(error.response.data);
+                            console.log(error.response.data);
+                            console.log("Status: " + error.response.status);
+                        } else if (error.request) {
+                            console.log(error.request);
+                        } else {
+                            console.log(error);
+                        }
+                    });
+                }
+            },
+            /**
+             * Wysyła request metodą PATCH w celu przyznania podanemu użytkownikowi roli zwykłego użytkownika.
+             */
+            makeUser() {
+                if (this.username2 == "admin") {
+                    window.alert("Nie można zmniejszyć uprawnień konta wbudowanego administatora.")
+                } else if (this.username2 == "") {
+                    window.alert("Prosimy uzupełnić nazwę użytkownika.");
+                    return;
+                } else {
+                    axios.patch("/users/setUser/" + this.username2 + "?access_token=" + getCookie("access_token"))
+                        .then((response) => {
+                            window.alert(response.data);
+                            console.log(response.data);
+                            console.log("Status: " + response.status);
+                        }).catch(error => {
+                        if (error.response) {
+                            window.alert(error.response.data);
+                            console.log(error.response.data);
+                            console.log("Status: " + error.response.status);
+                        } else if (error.request) {
+                            console.log(error.request);
+                        } else {
+                            console.log(error);
+                        }
+                    });
+                }
+            },
+            /**
+             * Wysyła request metodą PATCH w celu zmiany hasła podanemu użytkownikowi.
+             */
+            resetPassword() {
+                if (this.password2 !== this.passwordConfirm2) {
+                    window.alert("Hasła się nie zgadzają.");
+                    return;
+                } else if (this.password2 == "") {
+                    window.alert("Prosimy uzupełnić hasło.")
+                } else if (this.username3 == "") {
+                    window.alert("Prosimy uzupełnić nazwę użytkownika.")
+                } else {
+                    axios({
+                        method: 'patch',
+                        url: '/users/' + this.username3 + "?access_token=" + getCookie("access_token"),
+                        data: {responseString: this.password2}
+                    }).then((response) => {
+                        window.alert(response.data);
+                        console.log(response.data);
+                        console.log("Status: " + response.status);
+                    }).catch(error => {
+                        if (error.response) {
+                            window.alert(error.response.data);
+                            console.log(error.response.data);
+                            console.log("Status: " + error.response.status);
+                        } else if (error.request) {
+                            console.log(error.request);
+                        } else {
+                            console.log(error);
+                        }
+                    });
+                }
+            },
+            /**
+             * Wysyła request metodą DELETE w celu usunięcia z serwera obecnie zalogowanego użytkownika.
+             */
+            deleteUserSelf() {
+                if (this.infUsername == "admin") {
+                    window.alert("Nie wolno usunąć konta głównego administratora.");
+                } else {
+                    axios.delete("/users/?access_token=" + getCookie("access_token"))
+                        .then((response) => {
+                            window.Event.isLoggedIn = false;
+                            window.alert(response.data);
+                            console.log(response.data);
+                            console.log("Status: " + response.status);
+                            document.location.replace("/");
+                            delete_cookie("access_token");
+                        }).catch(error => {
+                        if (error.response) {
+                            window.alert(error.response.data);
+                            console.log(error.response.data);
+                            console.log("Status: " + error.response.status);
+                        } else if (error.request) {
+                            console.log(error.request);
+                        } else {
+                            console.log(error);
+                        }
+                    }).bind(this);
+                }
+            },
+            /**
+             * Wysyła request metodą POST w celu wysłania maila do wszystkich subskrybentów.
+             */
+            sendMail() {
+                if (this.mailTopic == "") {
+                    window.alert("Prosimy o uzupełnienie tematu maila.");
+                    return;
+                } else if (this.mailBody == "") {
+                    window.alert("Prosimy o uzupełnienie treści maila.");
+                    return;
+                } else {
+                    axios({
+                        method: 'post',
+                        url: 'mails/to-subscribers?access_token=' + getCookie("access_token"),
+                        data: {title: this.mailTopic, body: this.mailBody}
+                    }).then((response) => {
+                        window.alert(response.data);
+                        console.log(response.data);
+                        console.log("Status: " + response.status);
+                        document.location.reload();
+                    }).catch(error => {
+                        if (error.response) {
+                            window.alert(error.response.data);
+                            console.log(error.response.data);
+                            console.log("Status: " + error.response.status);
+                        } else if (error.request) {
+                            console.log(error.request);
+                        } else {
+                            console.log(error);
+                        }
+                    });
+                }
+            },
+            /**
+             * Zwraca link do listy postów o podanej kategorii.
+             */
+            getLinkCategories(post) {
+                return '/posts/category/' + post.category;
+            },
+            /**
+             * Wyciąga nazwę kategorii z paska adresu przeglądarki.
+             */
+            getPostCategory() {
+                let splitted = window.location.href.split('/');
+                return splitted[splitted.length - 1];
+            }
+        }
+    });
+</script>
+</html>

@@ -1,0 +1,122 @@
+<!--
+    Strona edycji posta.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.w3.org/1999/html" xmlns:v="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Edytuj post')" />
+<body>
+<div class="container">
+    <div class="topBackground">
+    </div>
+        <div th:replace="fragments/user-actions :: user-actions"></div>
+        <div th:replace="fragments/nav :: logo"></div>
+        <div th:replace="fragments/nav :: nav"></div>
+    <div class="box postForm">
+        <br />
+        <br />
+        <h2 style="width: 140%;">Edytuj post</h2>
+        <br />
+        <br />
+        <label for="title">Tytuł:</label><br />
+        <input type="text" v-model="post.title" id="title"/><br />
+        <select v-model="post.category">
+            <option disabled value="">Wybierz kategorię posta</option>
+            <option value="Rodzicielstwo">Rodzicielstwo</option>
+            <option value="Zdrowie">Zdrowie</option>
+            <option value="Porady">Porady</option>
+            <option value="Lifestyle">Lifestyle</option>
+            <option value="Historie">Historie</option>
+        </select><br />
+        <p>Treść:</p>
+        <editor v-model="post.body" :options="editorConfig" theme="snow" style="width:150%; margin-top:5px;"></editor>
+        <br />
+
+    </div>
+    <div class="bottom">
+        <button class="button" v-on:click="updatePost">Aktualizuj post</button><br />
+        <br />
+        <a class="returnButton" href="/">Powrót do strony głównej</a>
+    </div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    let app = new Vue({
+        el: '.container',
+        data: {
+            post: null,
+            postTitle: '',
+            postBody: '',
+            postCategory: '',
+            editorConfig: {
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [ 'link', 'image' ],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['clean']
+                    ]
+                }
+            }
+        },
+        created() {
+            this.fetchPost();
+        },
+        methods: {
+            /**
+             * Wysyła request metodą GET do kontrolera postów w celu pobrania z serwera posta o podanym ID.
+             */
+            fetchPost(){
+                axios.get("/posts/" + this.getPostId()).then(function(response){
+                    this.post = response.data;
+                }.bind(this));
+            },
+            /**
+             * Wysyła request metodą PUT do kontrolera postów w celu aktualizacji podanego posta.
+             */
+            updatePost(){
+                axios({
+                    method:'put',
+                    url:'/posts?access_token=' + getCookie("access_token"),
+                    data:{id:this.post.id, title:this.post.title,body:this.post.body, category:this.post.category}
+                }).then((response) => {
+                    window.alert(response.data);
+                    console.log(response.data);
+                    console.log("Status: " + response.status);
+                    document.location.replace("/");
+                }).catch(error => {
+                    if (error.response) {
+                        window.alert(error.response.data);
+                        console.log(error.response.data);
+                        console.log("Status: " + error.response.status);
+                    }
+                    else if (error.request) {
+                        console.log(error.request);
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+            },
+            /**
+             * Pobiera adres URL z przeglądarki i wyciąga z niego ID posta.
+             */
+            getPostId() {
+                let splitted = window.location.href.split('/');
+                return splitted[splitted.length-1];
+            }
+        }
+    });
+</script>
+</html>

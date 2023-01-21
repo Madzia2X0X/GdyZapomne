@@ -1,0 +1,42 @@
+<!--
+    Strona "O nas"
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - O nas')" />
+<body>
+<div class="container">
+    <div class="topBackground">
+    </div>
+        <div th:replace="fragments/user-actions :: user-actions"></div>
+        <div th:replace="fragments/nav :: logo"></div>
+        <div th:replace="fragments/nav :: nav"></div>
+    <div class="box header">
+        <h1>O naszym blogu</h1>
+    </div>
+        <div class="box aboutTopText">
+            <h3>Cześć!</h3>
+            <h3>Witamy Cię na naszym blogu stworzonym z myślą o początkujących mamach.</h3>
+        </div>
+        <div class="box aboutPhoto">
+            <img class="photoAbout" th:src="@{/img/about.jpg}" alt="About us - photo">
+        </div>
+        <div class="box aboutLeftText">
+            <h3>Znajdziesz tutaj porady dotyczące rodzicielstwa, zdrowia, samopoczucia,</h3>
+            <h3>jak i również miejsce, w którym będziesz mogła dzielić się swoim szczęściem</h3>
+            <h3>z innymi.</h3>
+        </div>
+        <div class="box aboutBottomText">
+            <h3>Załóż konto i dołącz do naszego wyjątkowego grona :)</h3>
+        </div>
+        <div class="box bottom">
+        </div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    let app = new Vue({
+        el: '.container'
+    });
+</script>
+</html>

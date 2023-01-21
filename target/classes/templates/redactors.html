@@ -1,0 +1,74 @@
+<!--
+    Strona "Redaktorzy"
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Redaktorzy')" />
+<body>
+<div class="container">
+    <div class="topBackground">
+    </div>
+    <div th:replace="fragments/user-actions :: user-actions"></div>
+    <div th:replace="fragments/nav :: logo"></div>
+    <div th:replace="fragments/nav :: nav"></div>
+    <div class="box header">
+        <h1>Nasi redaktorzy:</h1>
+    </div>
+        <div class="box redactor1Avatar">
+            <a href="posts/filtered/user/jmajewska"><img class="photoRedactor1" th:src="@{/img/redactor1.png}" alt="First redactor"></a>
+        </div>
+        <div class="box redactor1Text">
+            <h2><a href="posts/filtered/user/jmajewska">Julia Majewska</a></h2>
+            <br />
+            <h5>Cześć! Jestem założycielką tego bloga. Mam na swoim koncie kilka specjalizacji, pracę w różnych miejscach,
+                ale największą przyjemność sprawia mi bycie animatorem życia mojej rodziny.
+                W moich postach znajdziesz informacje, gdzie warto wybrać się w podróż z dzieckiem,
+                mnóstwo porad związanych z wychowaniem dzieci, cennych informacji związanych z ciążą i wiele,
+                wiele innych wartych przeczytania wpisów.
+                Dowiesz się również, jak skutecznie przekonać ”niejadka” do jedzenia i jak po prostu zdrowo jeść! </h5>
+        </div>
+        <div class="box redactor2Avatar">
+            <a href="posts/filtered/user/kkowalski"><img class="photoRedactor2" th:src="@{/img/redactor2.png}" alt="Second redactor"></a>
+        </div>
+        <div class="box redactor2Text">
+            <h2><a href="posts/filtered/user/kkowalski">Kamil Kowalski</a></h2>
+            <br />
+            <h5>Młody ojciec trójki dzieci. Według Kamila dzieci uczą się wielu rzeczy od rodziców,
+                ale też i rodzice mogą nauczyć się wielu rzeczy od dzieci.
+                Na blogu znajdziesz głównie cenne informacje dotyczące wychowania dzieci,
+                o klapsach, czy o sztuce rozmawiania z nimi.
+                Autor bloga czynnie rozprawia się również z firmami, których produkty wręcz szkodzą dzieciom.
+                W świetny, humorystyczny sposób przedstawia również nagą prawdę, jak naprawdę wygląda dzień każdego rodzica.</h5>
+        </div>
+        <div class="box redactor3Avatar">
+            <a href="posts/by_user/knowak"><img class="photoRedactor3" th:src="@{/img/redactor3.png}" alt="Third redactor"></a>
+        </div>
+        <div class="box redactor3Text">
+            <h2><a href="posts/filtered/user/knowak">Karolina Nowak</a></h2>
+            <br />
+            <h5>Szalona dziewczyna interesująca się wszystkim, co nowoczesne (elektronika) i szybkie (samochody),
+                z poczuciem humoru i trochę wariackim podejściem do życia.
+                Uczynna i pełna energii. Maniaczka sportu, gadżetów, gór i średniowiecznych zamków.</h5>
+        </div>
+        <div class="box redactor4Avatar">
+            <a href="posts/filtered/user/jzajac"><img class="photoRedactor4" th:src="@{/img/redactor4.png}" alt="Fourth redactor"></a>
+        </div>
+        <div class="box redactor4Text">
+            <h2><a href="posts/filtered/user/jzajac">Justyna Zając</a></h2>
+            <br />
+            <h5>Jestem farmaceutką, a przede wszystkim mamą. Pragnę szerzyć wiedzę na temat właściwej pielęgnacji i ochrony zdrowia dziecka.
+                Wspierać, pomagać, rozwiewać wątpliwości. A przy tym wszystkim być inspiracją i natchnieniem.
+                Stwarzać miejsce, do którego chętnie się wraca. Gdzie można się czegoś dowiedzieć i coś podejrzeć.
+            </h5>
+        </div>
+        <div class="box bottom">
+</div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    let app = new Vue({
+        el: '.container'
+    });
+</script>
+</html>

@@ -1,0 +1,29 @@
+<!--
+        Nagłówek strony - zawiera logo oraz menu
+-->
+<div th:fragment="logo" class="box logoPlace">
+        <a href="/"><img class="logo" th:src="@{/img/logo.png}" alt="Blog logo"></a>
+</div>
+<div th:fragment="nav" class="box navigation">
+        <div clas="nav_options">
+                <div class="nav_buttons">
+                        <ul>
+                                <li> <a href="/" class="button">Strona główna</a></li>
+                                <li> <a href="/search" class="button">Wyszukaj</a></li>
+                                <li><a href="/about" class="button">O nas</a></li>
+                                <li class="dropdown">
+                                        <a href="javascript:void(0)" class="dropbtn">Kategorie</a>
+                                        <div class="dropdown-content">
+                                                <a href="/posts/filtered/category/Rodzicielstwo">Rodzicielstwo</a>
+                                                <a href="/posts/filtered/category/Zdrowie">Zdrowie</a>
+                                                <a href="/posts/filtered/category/Porady">Porady</a>
+                                                <a href="/posts/filtered/category/Lifestyle">Lifestyle</a>
+                                                <a href="/posts/filtered/category/Historie">Historie</a>
+                                        </div>
+                                </li>
+                                <li><a href="/redactors" class="button">Nasi redaktorzy</a></li>
+                                <li><a href="/contact" class="button">Kontakt</a></li>
+                        </ul>
+                </div>
+        </div>
+</div>

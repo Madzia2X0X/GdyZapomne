@@ -1,0 +1,77 @@
+<!--
+    Strona logowania.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/top :: top('Gdy zapomnę - Logowanie')" />
+<body>
+<div class="container" @keyup.enter="login">
+    <div class="topBackground">
+    </div>
+    <div th:replace="fragments/user-actions :: user-actions"></div>
+    <div th:replace="fragments/nav :: logo"></div>
+    <div th:replace="fragments/nav :: nav"></div>
+    <div class="box loginForm">
+        <br />
+        <br />
+        <h2>Logowanie</h2>
+        <br />
+        <br />
+        <label for="username">Nazwa użytkownika</label><br />
+        <input v-model="username" type="text" placeholder="" id="username"/><br />
+        <label for="password">Hasło</label><br />
+        <input v-model="password" type="password" id="password"/><br />
+        <input type="submit"  v-on:click="login" value="Zaloguj się"/>
+        <br />
+    </div>
+    <div class="box bottom">
+    </div>
+</div>
+</body>
+<div th:replace="fragments/scripts :: scripts"></div>
+<script>
+    let app = new Vue({
+        el: '.container',
+        data:{
+            username: '',
+            password: '',
+        },
+        methods: {
+            /**
+             * Wysyła request metodą POST do endpointa oAuth2, żeby się zalogować i pobrać z serwera token dostępu (oAuth2).
+             */
+            login() {
+                let params = new URLSearchParams();
+                params.append('grant_type', 'password');
+                params.append('username', this.username);
+                params.append('password', this.password);
+                axios({
+                    method: 'post',
+                    url: 'oauth/token',
+                    auth: {username: 'my-trusted-client', password: 'secret'},
+                    headers: {"Content-type": "application/x-www-form-urlencoded; charset=utf-8"},
+                    data: params
+                }).then((response) => {
+                    document.cookie = "access_token=" + response.data.access_token + ";path=/";
+                    document.location.replace("/");
+                }).catch(error => {
+                    if (error.response) {
+                        if(error.response.data.error == 'unauthorized') {
+                            window.alert("Nieprawidłowa nazwa użytkownika lub hasło.");
+                        }
+                        if(error.response.data.error == 'invalid_grant') {
+                            window.alert("Nieprawidłowa nazwa użytkownika lub hasło.");
+                        }
+                        console.log("Error messsage: " + error.response.data.error);
+                        console.log("Status: " + error.response.status);
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log(error);
+                    }
+                });
+            }
+        }
+    });
+</script>
+</html>

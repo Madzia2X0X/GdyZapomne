@@ -1,0 +1,12 @@
+<!--
+    Metadane strony wraz z importami plików styli CSS
+-->
+<head th:fragment="top(title)">
+    <meta charset="UTF-8" />
+    <title th:text="${title}"></title>
+    <link href="https://fonts.googleapis.com/css2?family=Commissioner&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/css/editor.css}"/>
+    <link rel="icon" th:href="@{/img/favicon.ico}" />
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}" />
+</head>
